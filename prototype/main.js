@@ -116,7 +116,7 @@ function init() {
     _initCanvas(canvas);
 	
 	for(let i = 0; i < GhostCount; i++){
-		Ghosts[i] = new entitys.ghost();		
+		Ghosts[i] = new ghost();		
 	}
 	
 	let Count = 0;
@@ -126,7 +126,7 @@ function init() {
 			Count++;			
 		}
 		if (field[i] == 3){ //Pacman 3
-			entitys.Pacman.pos = i;
+			Pacman.pos = i;
 		}
 	}
 	for(let i = 0; i < 399; i++) if(field[i] == 0) Food++;
@@ -144,8 +144,8 @@ function _tick() {
 	window.onkeydown = processKey;
 	UpdateState();
 	draw();
-	if (lose) {sleep(200); alert("Ты проиграл!");}
-    if (entitys.Pacman.score == Food) {sleep(200); alert("Ты победил!");}	 
+	if (lose) {alert("Ты проиграл!"); window.location.reload(); sleep(200);}
+    if (Pacman.score == Food) {alert("Ты победил!"); window.location.reload(); sleep(200);}	  
 }
 
 function draw() {	
@@ -162,10 +162,10 @@ function draw() {
 	 
 		if (field[i] == 3){ //Pacman 3
 			GAME.canvasContext.drawImage(GAME.sprites.EmptyCell, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
-			if ((entitys.Pacman.Direction.Now == 1) || (entitys.Pacman.Direction.Now == 0))GAME.canvasContext.drawImage(GAME.sprites.Right, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
-			if (entitys.Pacman.Direction.Now == -1) GAME.canvasContext.drawImage(GAME.sprites.Left, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
-			if (entitys.Pacman.Direction.Now == -19) GAME.canvasContext.drawImage(GAME.sprites.Top, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
-			if (entitys.Pacman.Direction.Now == 19) GAME.canvasContext.drawImage(GAME.sprites.Bottom, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
+			if ((Pacman.Direction.Now == 1) || (Pacman.Direction.Now == 0))GAME.canvasContext.drawImage(GAME.sprites.Right, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
+			if (Pacman.Direction.Now == -1) GAME.canvasContext.drawImage(GAME.sprites.Left, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
+			if (Pacman.Direction.Now == -19) GAME.canvasContext.drawImage(GAME.sprites.Top, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
+			if (Pacman.Direction.Now == 19) GAME.canvasContext.drawImage(GAME.sprites.Bottom, (Cell.width*(i%19)), (Cell.height*(Math.floor(i/19))), Cell.width, Cell.height);
 		}
 		if (field[i] == 4){ //Ghost 4
 			if (Count < GhostCount){
@@ -177,24 +177,24 @@ function draw() {
 	}
 	GAME.canvasContext.font = "30px Arial";   	
 	GAME.canvasContext.fillStyle = "red";  
-	GAME.canvasContext.fillText(entitys.Pacman.score, 12, 27); 
+	GAME.canvasContext.fillText(Pacman.score, 12, 27); 
 }
 
 function UpdateState(){
-	if (field[entitys.Pacman.pos] == 3){ //Pacman
-		if (field[entitys.Pacman.pos+entitys.Pacman.Direction.Next] != 1){
-			entitys.Pacman.Direction.Now = entitys.Pacman.Direction.Next;		  				  
+	if (field[Pacman.pos] == 3){ //Pacman
+		if (field[Pacman.pos+Pacman.Direction.Next] != 1){
+			Pacman.Direction.Now = Pacman.Direction.Next;		  				  
 		}
-		if (field[entitys.Pacman.pos+entitys.Pacman.Direction.Now] == 0)
-			entitys.Pacman.score++;
-		if (field[entitys.Pacman.pos+entitys.Pacman.Direction.Now] == 4){
-			field[entitys.Pacman.pos] = 2;
+		if (field[Pacman.pos+Pacman.Direction.Now] == 0)
+			Pacman.score++;
+		if (field[Pacman.pos+Pacman.Direction.Now] == 4){
+			field[Pacman.pos] = 2;
 			lose = true;		  				  
 		}
-		if ((field[entitys.Pacman.pos+entitys.Pacman.Direction.Now] != 1) && (!lose)){
-			field[entitys.Pacman.pos] = 2;
-			field[entitys.Pacman.pos+entitys.Pacman.Direction.Now] = 3;	
-            entitys.Pacman.pos = entitys.Pacman.pos + entitys.Pacman.Direction.Now;		
+		if ((field[Pacman.pos+Pacman.Direction.Now] != 1) && (!lose)){
+			field[Pacman.pos] = 2;
+			field[Pacman.pos+Pacman.Direction.Now] = 3;	
+            Pacman.pos = Pacman.pos + Pacman.Direction.Now;		
 		}
 	} else {lose = true;}				  
 		
@@ -209,16 +209,16 @@ function UpdateState(){
 
 function processKey(e) { 
   if (e.keyCode == 38) { //Вверх
-	entitys.Pacman.Direction.Next = -19;
+	Pacman.Direction.Next = -19;
   }
   if (e.keyCode == 40) { //Вниз
-	entitys.Pacman.Direction.Next = 19;
+	Pacman.Direction.Next = 19;
   }
   if (e.keyCode == 37) { //Влево
-	entitys.Pacman.Direction.Next = -1;
+	Pacman.Direction.Next = -1;
   }
   if (e.keyCode == 39) { //Вправо
-	entitys.Pacman.Direction.Next = 1;
+	Pacman.Direction.Next = 1;
   }
 }
 
@@ -235,4 +235,3 @@ function getRandomIntInclusive(min, max) {
 	max = Math.floor(max);
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
