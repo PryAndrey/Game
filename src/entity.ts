@@ -1,22 +1,30 @@
-export let Pacman = {       
-	score: 0,    
-	Direction: {
+import {field} from "./map";
+
+export class Pacman {       
+	score = 0    
+	Direction = {
 		Now: 0,
 		Next: 0,
-	},
-	pos: 0,
+	}
+	pos = 0
 }
 
-export class ghost {
+export class Ghost {
 	mem = 2
 	Direction = 0	
 	pos = 0
 	
+	getRandomIntInclusive(min:number, max:number) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
 	ChooseWays(){
 		if ((field[this.pos+1] == 0) || (field[this.pos-1] == 0) || (field[this.pos+19] == 0) || (field[this.pos-19] == 0) || 
 		    (field[this.pos+1] == 2) || (field[this.pos-1] == 2) || (field[this.pos+19] == 2) || (field[this.pos-19] == 2)){
 			while (this.Direction == 0) {
-				let R = getRandomIntInclusive(1, 4);	
+				let R = this.getRandomIntInclusive(1, 4);	
 				if (R <= 2){
 					if (R == 1){
 						if ((field[this.pos+1] != 1) && (field[this.pos+1] != 4)) this.Direction = 1;
@@ -47,6 +55,6 @@ export class ghost {
 				this.mem = 2;
 			field[this.pos+this.Direction] = 4;	
 			this.pos = this.pos + this.Direction;
-		}		
+			}		
     }	
 }
