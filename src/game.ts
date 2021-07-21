@@ -9,7 +9,7 @@ export class GAME {
     HEIGHT = 840
     PAUSE = 400
 	GHOSTCOUNT = 5
-    canvasContext: any = null
+    canvasContext: any
 	Food = 0
 	lose = false
 	SPRITES = {
@@ -123,8 +123,8 @@ export class GAME {
 			}
 		} else {this.lose = true;}				  
 			
-		for(let i = 0; i < this.GHOSTCOUNT; i++){
-			if (field[this.Ghosts[i].pos] == 4){  //Ghost							
+		for(let i = 0; i < this.GHOSTCOUNT; i++){  //Ghost
+			if (field[this.Ghosts[i].pos] == 4){  							
 				this.Ghosts[i].ChooseWays();	
 				this.Ghosts[i].UpdatePosition();
 				this.Ghosts[i].Direction = 0;				  		
@@ -133,6 +133,7 @@ export class GAME {
 	}
 	
 	tick() {
+		//alert( typeof this.updateState ); 
 		window.onkeydown = this.processKey;
 		this.updateState();
 		this.draw();

@@ -1,12 +1,12 @@
 import {field} from "./map";
 
 export class Pacman {       
-	score = 0    
+	score: number = 0    
 	Direction = {
 		Now: 0,
 		Next: 0,
 	}
-	pos = 0
+	pos: number = 0
 }
 
 export class Ghost {
