@@ -1,8 +1,6 @@
 import {Pacman, Ghost} from "./entity";
 import {field} from "./map";
 import {sleep} from "./helper";
-			
-
 
 export class GAME {
     WIDTH = 760
@@ -11,7 +9,6 @@ export class GAME {
 	GHOSTCOUNT = 5
     canvasContext: any
 	Food = 0
-	lose = false
 	SPRITES = {
         Ghost: new Image(),		
 		Wall: new Image(),
@@ -65,8 +62,8 @@ export class GAME {
 			}
 		}
 		for(let i = 0; i < 399; i++) if(field[i] == 0) this.Food++;
-		
-		setInterval(this.tick, this.PAUSE);
+		this._initGameLoop();
+		//setInterval(this.tick, this.PAUSE);
 	}
 	
 	stop() {
@@ -87,10 +84,10 @@ export class GAME {
 		
 			if (field[i] == 3){ //pacman 3
 				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if ((this.pacman.Direction.Now == 1) || (this.pacman.Direction.Now == 0))this.canvasContext.drawImage(this.SPRITES.Right, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if (this.pacman.Direction.Now == -1) this.canvasContext.drawImage(this.SPRITES.Left, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if (this.pacman.Direction.Now == -19) this.canvasContext.drawImage(this.SPRITES.Top, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if (this.pacman.Direction.Now == 19) this.canvasContext.drawImage(this.SPRITES.Bottom, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if ((this.pacman.NowDirection == 1) || (this.pacman.NowDirection == 0))this.canvasContext.drawImage(this.SPRITES.Right, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if (this.pacman.NowDirection == -1) this.canvasContext.drawImage(this.SPRITES.Left, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if (this.pacman.NowDirection == -19) this.canvasContext.drawImage(this.SPRITES.Top, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if (this.pacman.NowDirection == 19) this.canvasContext.drawImage(this.SPRITES.Bottom, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			}
 			if (field[i] == 4){ //Ghost 4
 				if (Count < this.GHOSTCOUNT){
@@ -105,24 +102,8 @@ export class GAME {
 		this.canvasContext.fillText(this.pacman.score, 12, 27); 
 	}
 	
-	updateState() {
-		if (field[this.pacman.pos] == 3){ //pacman
-			if (field[this.pacman.pos+this.pacman.Direction.Next] != 1){
-				this.pacman.Direction.Now = this.pacman.Direction.Next;		  				  
-			}
-			if (field[this.pacman.pos+this.pacman.Direction.Now] == 0)
-				this.pacman.score++;
-			if (field[this.pacman.pos+this.pacman.Direction.Now] == 4){
-				field[this.pacman.pos] = 2;
-				this.lose = true;		  				  
-			}
-			if ((field[this.pacman.pos+this.pacman.Direction.Now] != 1) && (!this.lose)){
-				field[this.pacman.pos] = 2;
-				field[this.pacman.pos+this.pacman.Direction.Now] = 3;	
-				this.pacman.pos = this.pacman.pos + this.pacman.Direction.Now;		
-			}
-		} else {this.lose = true;}				  
-			
+	updateState() {	
+		this.pacman.UpdatePosition();		
 		for(let i = 0; i < this.GHOSTCOUNT; i++){  //Ghost
 			if (field[this.Ghosts[i].pos] == 4){  							
 				this.Ghosts[i].ChooseWays();	
@@ -133,27 +114,35 @@ export class GAME {
 	}
 	
 	tick() {
-		//alert( typeof this.updateState ); 
-		window.onkeydown = this.processKey;
+		window.onkeydown = this.pacman.processKey;
 		this.updateState();
 		this.draw();
-		if (this.lose) {alert("Ты проиграл!"); window.location.reload(); sleep(200);}
-		if (this.pacman.score == this.Food) {alert("Ты победил!"); window.location.reload(); sleep(200);}	  
+		sleep(this.PAUSE);
 	}
 	
-		
-	processKey(e:any) { 
-		if (e.keyCode == 38) { //Вверх
-			this.pacman.Direction.Next = -19;
+	_gameIsOver(){
+		return false;
+		if (this.pacman.lose) {
+			alert("Ты проиграл!"); 
+			//window.location.reload(); 
+			sleep(200);
+			return true;
 		}
-		if (e.keyCode == 40) { //Вниз
-			this.pacman.Direction.Next = 19;
-		}
-		if (e.keyCode == 37) { //Влево
-			this.pacman.Direction.Next = -1;
-		}
-		if (e.keyCode == 39) { //Вправо
-			this.pacman.Direction.Next = 1;
-		}
-}
+		if (this.pacman.score == this.Food) {
+			alert("Ты победил!"); 
+			//window.location.reload(); 
+			sleep(200);
+			return true;
+		}	  
+	}
+	
+	private _initGameLoop() {
+        requestAnimationFrame(() => {
+            if (!this._gameIsOver()) {
+                this.tick();
+                this._initGameLoop();
+            }
+        }
+		)
+    }
 }

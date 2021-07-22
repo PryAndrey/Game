@@ -2,12 +2,49 @@ import {field} from "./map";
 
 export class Pacman {       
 	score: number = 0    
-	Direction = {
-		Now: 0,
-		Next: 0,
+//	Direction: {Now: number, Next: number} = {
+//		Now: 0,
+//		Next: 0,
+//	}
+	pos: number = 0	
+	lose = false
+	NowDirection: number = 0
+	NextDirection: number = 0
+	
+	processKey(e:any) {
+		if (e.keyCode == 38) { //Вверх
+			this.NextDirection = -19;
+		}
+		if (e.keyCode == 40) { //Вниз
+			this.NextDirection = 19;
+		}
+		if (e.keyCode == 37) { //Влево
+			this.NextDirection = -1;
+		}
+		if (e.keyCode == 39) { //Вправо
+			this.NextDirection = 1;
+		}
 	}
-	pos: number = 0
+	UpdatePosition(){
+		if (field[this.pos] == 3){ //pacman
+			if (field[this.pos+this.NextDirection] != 1){
+				this.NowDirection = this.NextDirection;		  				  
+			}
+			if (field[this.pos+this.NowDirection] == 0)
+				this.score++;
+			if (field[this.pos+this.NowDirection] == 4){
+				field[this.pos] = 2;
+				this.lose = true;		  				  
+			}
+			if ((field[this.pos+this.NowDirection] != 1) && (!this.lose)){
+				field[this.pos] = 2;
+				field[this.pos+this.NowDirection] = 3;	
+				this.pos = this.pos + this.NowDirection;		
+			}
+		} else {this.lose = true;}
+	}	
 }
+
 
 export class Ghost {
 	mem = 2
