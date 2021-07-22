@@ -1,31 +1,13 @@
 import {field} from "./map";
-
+	
 export class Pacman {       
 	score: number = 0    
-//	Direction: {Now: number, Next: number} = {
-//		Now: 0,
-//		Next: 0,
-//	}
 	pos: number = 0	
 	lose = false
 	NowDirection: number = 0
 	NextDirection: number = 0
 	
-	processKey(e:any) {
-		if (e.keyCode == 38) { //Вверх
-			this.NextDirection = -19;
-		}
-		if (e.keyCode == 40) { //Вниз
-			this.NextDirection = 19;
-		}
-		if (e.keyCode == 37) { //Влево
-			this.NextDirection = -1;
-		}
-		if (e.keyCode == 39) { //Вправо
-			this.NextDirection = 1;
-		}
-	}
-	UpdatePosition(){
+	public UpdatePosition(){
 		if (field[this.pos] == 3){ //pacman
 			if (field[this.pos+this.NextDirection] != 1){
 				this.NowDirection = this.NextDirection;		  				  
@@ -51,13 +33,13 @@ export class Ghost {
 	Direction = 0	
 	pos = 0
 	
-	getRandomIntInclusive(min:number, max:number) {
+	private getRandomIntInclusive(min:number, max:number) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
-	ChooseWays(){
+	public ChooseWays(){
 		if ((field[this.pos+1] == 0) || (field[this.pos-1] == 0) || (field[this.pos+19] == 0) || (field[this.pos-19] == 0) || 
 		    (field[this.pos+1] == 2) || (field[this.pos-1] == 2) || (field[this.pos+19] == 2) || (field[this.pos-19] == 2)){
 			while (this.Direction == 0) {
@@ -79,7 +61,7 @@ export class Ghost {
 		}
     }
 	
-	UpdatePosition(){
+	public UpdatePosition(){
 		if (field[this.pos+this.Direction] != 1){				
 			if (this.mem == 0)
 				field[this.pos] = 0;

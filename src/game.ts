@@ -28,13 +28,21 @@ export class GAME {
 	Ghosts = new Array();
 	pacman = new Pacman();
 	
-	initCanvas(canvas: any) {
-		canvas.width = this.WIDTH;
-		canvas.height = this.HEIGHT;
-		this.canvasContext = canvas.getContext("2d");
-	}
 	
-	start() {		
+	
+	public start() {		
+		this.connectSprites();
+		let canvas = document.getElementById("canvas");
+		this.initCanvas(canvas);
+		this.initEntitys();		
+		this._initGameLoop();
+	}
+
+	public stop() {
+		alert("Stop!");	  
+	}
+
+	private connectSprites(){
 		this.SPRITES.Top.src = "img/PacmanT.png"
 		this.SPRITES.Bottom.src = "img/PacmanB.png"
 		this.SPRITES.Right.src = "img/PacmanR.png"
@@ -43,16 +51,20 @@ export class GAME {
 		this.SPRITES.Wall.src = "img/Wall.png" 
 		this.SPRITES.EmptyCell.src = "img/EmptyCell.png"
 		this.SPRITES.FoodCell.src = "img/FoodCell.png"
-		
-		let canvas = document.getElementById("canvas");
-		this.initCanvas(canvas);
-		
+	}
+
+	private initCanvas(canvas: any){
+		canvas.width = this.WIDTH;
+		canvas.height = this.HEIGHT;
+		this.canvasContext = canvas.getContext("2d");
+	}
+	
+	private initEntitys(){
 		for(let i = 0; i < this.GHOSTCOUNT; i++){
 			this.Ghosts[i] = new Ghost();		
 		}
-		
 		let Count = 0;
-		for(let i = 0; i < 399; i++){
+		for(let i = 0; i < 399; i++){ //Ghost
 			if (field[i] == 4){ 
 				if (Count < this.GHOSTCOUNT){this.Ghosts[Count].pos = i;} else {field[i] = 0}
 				Count++;			
@@ -61,16 +73,11 @@ export class GAME {
 				this.pacman.pos = i;
 			}
 		}
+		
 		for(let i = 0; i < 399; i++) if(field[i] == 0) this.Food++;
-		this._initGameLoop();
-		//setInterval(this.tick, this.PAUSE);
 	}
 	
-	stop() {
-		alert("Stop!");	  
-	}
-	
-	draw() {	
+	private draw() {	
 		let Count = 0;
 		this.canvasContext.clearRect(0, 0, this.WIDTH, this.HEIGHT);
 		
@@ -91,7 +98,7 @@ export class GAME {
 			}
 			if (field[i] == 4){ //Ghost 4
 				if (Count < this.GHOSTCOUNT){
-					this.canvasContext.drawImage(this.SPRITES.FoodCell, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);  
+					this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);  
 					this.canvasContext.drawImage(this.SPRITES.Ghost, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
 				}
 				Count++;			
@@ -102,8 +109,8 @@ export class GAME {
 		this.canvasContext.fillText(this.pacman.score, 12, 27); 
 	}
 	
-	updateState() {	
-		this.pacman.UpdatePosition();		
+	private updateState() {	
+		this.pacman.UpdatePosition();	//Pacman	
 		for(let i = 0; i < this.GHOSTCOUNT; i++){  //Ghost
 			if (field[this.Ghosts[i].pos] == 4){  							
 				this.Ghosts[i].ChooseWays();	
@@ -112,15 +119,31 @@ export class GAME {
 			}
 		}
 	}
-	
-	tick() {
-		window.onkeydown = this.pacman.processKey;
+	private processKey(e:any) {
+		if (e.keyCode == 38) { //Вверх
+			this.pacman.NextDirection = -19;
+		}
+		if (e.keyCode == 40) { //Вниз
+			this.pacman.NextDirection = 19;
+		}
+		if (e.keyCode == 37) { //Влево
+			this.pacman.NextDirection = -1;
+		}
+		if (e.keyCode == 39) { //Вправо
+			this.pacman.NextDirection = 1;
+		}
+	}
+	private tick() {
+		//alert( typeof this.pacman.NowDirection );
+		window.onkeydown = this.processKey;
+		//alert( typeof this.pacman.NowDirection );
 		this.updateState();
+		//alert( typeof this.pacman.NowDirection );
 		this.draw();
 		sleep(this.PAUSE);
 	}
 	
-	_gameIsOver(){
+	private _gameIsOver(){
 		return false;
 		if (this.pacman.lose) {
 			alert("Ты проиграл!"); 
