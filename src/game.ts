@@ -6,9 +6,11 @@ export class GAME {
     WIDTH = 760
     HEIGHT = 840
     PAUSE = 400
-	GHOSTCOUNT = 5
+	GHOSTCOUNT = 7
     canvasContext: any
-	Food = 0
+	Food = 0	
+	Ghosts = new Array();
+	pacman = new Pacman();
 	SPRITES = {
         Ghost: new Image(),		
 		Wall: new Image(),
@@ -25,11 +27,6 @@ export class GAME {
 		HEIGHT: this.HEIGHT / 21,
 	}
 	
-	Ghosts = new Array();
-	pacman = new Pacman();
-	
-	
-	
 	public start() {		
 		this.connectSprites();
 		let canvas = document.getElementById("canvas");
@@ -39,7 +36,7 @@ export class GAME {
 	}
 
 	public stop() {
-		alert("Stop!");	  
+		window.location.reload(); 
 	}
 
 	private connectSprites(){
@@ -78,7 +75,6 @@ export class GAME {
 	}
 	
 	private draw() {	
-		let Count = 0;
 		this.canvasContext.clearRect(0, 0, this.WIDTH, this.HEIGHT);
 		
 		for(let i = 0; i <= 399; i ++){
@@ -97,16 +93,13 @@ export class GAME {
 				if (this.pacman.NowDirection == 19) this.canvasContext.drawImage(this.SPRITES.Bottom, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			}
 			if (field[i] == 4){ //Ghost 4
-				if (Count < this.GHOSTCOUNT){
-					this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);  
-					this.canvasContext.drawImage(this.SPRITES.Ghost, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				}
-				Count++;			
+				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);  
+				this.canvasContext.drawImage(this.SPRITES.Ghost, (this.CELL.WIDTH*(i%19)), (this.CELL.HEIGHT*(Math.floor(i/19))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			}
 		}
-		this.canvasContext.font = "30px Arial";   	
-		this.canvasContext.fillStyle = "red";  
-		this.canvasContext.fillText(this.pacman.score, 12, 27); 
+		this.canvasContext.font = "30px Arial";
+		this.canvasContext.fillStyle = "red";
+		this.canvasContext.fillText(this.pacman.score, 12, 27);
 	}
 	
 	private updateState() {	
@@ -119,6 +112,7 @@ export class GAME {
 			}
 		}
 	}
+	
 	private processKey(e:any) {
 		if (e.keyCode == 38) { //Вверх
 			this.pacman.NextDirection = -19;
@@ -133,30 +127,25 @@ export class GAME {
 			this.pacman.NextDirection = 1;
 		}
 	}
+	
 	private tick() {
-		//alert( typeof this.pacman.NowDirection );
 		window.onkeydown = this.processKey;
-		//alert( typeof this.pacman.NowDirection );
 		this.updateState();
-		//alert( typeof this.pacman.NowDirection );
 		this.draw();
 		sleep(this.PAUSE);
 	}
 	
-	private _gameIsOver(){
-		return false;
-		if (this.pacman.lose) {
-			alert("Ты проиграл!"); 
-			//window.location.reload(); 
+	private _gameIsOver(){		
+		if ((this.pacman.lose) || (this.pacman.score == this.Food)) {
+			if (this.pacman.lose) {
+				alert("Ты проиграл!"); 
+			}
+			if (this.pacman.score == this.Food) {
+				alert("Ты победил!"); 
+			}
 			sleep(200);
 			return true;
-		}
-		if (this.pacman.score == this.Food) {
-			alert("Ты победил!"); 
-			//window.location.reload(); 
-			sleep(200);
-			return true;
-		}	  
+		} else {return false;}
 	}
 	
 	private _initGameLoop() {
