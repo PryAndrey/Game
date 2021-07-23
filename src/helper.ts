@@ -3,7 +3,7 @@ export function sleep(millis:number) {
 	while (((new Date()).getTime() - j) < millis) {	}
 }
 
-export enum Directions { //Directions.Up; - (-19)
+export enum Directions { 
 	Up = -19,
 	Left = -1,
 	Stay = 0,

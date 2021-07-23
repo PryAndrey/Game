@@ -81,3 +81,24 @@ export class Ghost {
 			}		
     }	
 }
+
+export function initEntitys(GHOSTCOUNT:number, pacman:Pacman, ghosts: any){
+	for(let i = 0; i < GHOSTCOUNT; i++){
+		ghosts[i] = new Ghost();		
+	}
+	let Count = 0;
+	for(let i = 0; i < 399; i++){ //Ghost
+		if (field[i] == 4){ 
+			if (Count < GHOSTCOUNT){
+				ghosts[Count].pos = i;
+			} else {
+				field[i] = 0}
+			Count++;			
+		}
+		if (field[i] == 3) //pacman 3
+			pacman.pos = i;		
+	}		
+	let food = 0;
+	for(let i = 0; i < 399; i++) if(field[i] == 0) food++;
+	return food;
+}

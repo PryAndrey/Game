@@ -1,4 +1,4 @@
-import {Pacman, Ghost} from "./entity";
+import {Pacman, initEntitys} from "./entity";
 import {field} from "./map";
 import {sleep, Directions} from "./helper";
 
@@ -7,8 +7,8 @@ export class GAME {
     WIDTH = 760 * this.SIZE
     HEIGHT = 840 * this.SIZE
     PAUSE = 400
-	COUNTCOLUMNS = 19
-	COUNTROWS = 21
+	COLUMNS = 19
+	ROWS = 21
 	GHOSTCOUNT = 1
     canvasContext: any
 	food = 0	
@@ -27,20 +27,16 @@ export class GAME {
     }
 	
 	CELL = {
-		WIDTH: this.WIDTH / this.COUNTCOLUMNS,
-		HEIGHT: this.HEIGHT / this.COUNTROWS,
+		WIDTH: this.WIDTH / this.COLUMNS,
+		HEIGHT: this.HEIGHT / this.ROWS,
 	}
 	
 	public start() {		
 		this.connectSprites();
 		let canvas = document.getElementById("canvas");
-		this.initCanvas(canvas);
-		this.initEntitys();		
+		this.initCanvas(canvas);	
+		this.food = initEntitys(this.GHOSTCOUNT, this.pacman, this.ghosts);
 		this._initGameLoop();
-	}
-
-	public stop() {
-		window.location.reload(); 
 	}
 
 	private connectSprites(){
@@ -60,47 +56,28 @@ export class GAME {
 		this.canvasContext = canvas.getContext("2d");
 	}
 	
-	private initEntitys(){
-		for(let i = 0; i < this.GHOSTCOUNT; i++){
-			this.ghosts[i] = new Ghost();		
-		}
-		let Count = 0;
-		for(let i = 0; i < 399; i++){ //Ghost
-			if (field[i] == 4){ 
-				if (Count < this.GHOSTCOUNT){
-					this.ghosts[Count].pos = i;
-				} else {
-					field[i] = 0}
-				Count++;			
-			}
-			if (field[i] == 3) //pacman 3
-				this.pacman.pos = i;		
-		}		
-		for(let i = 0; i < 399; i++) if(field[i] == 0) this.food++;
-	}
-	
 	private draw() {	
 		this.canvasContext.clearRect(0, 0, this.WIDTH, this.HEIGHT);
 		
 		for(let i = 0; i <= 399; i ++){
 			if (field[i] == 0)  //FoodCell 0
-				this.canvasContext.drawImage(this.SPRITES.FoodCell, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				this.canvasContext.drawImage(this.SPRITES.FoodCell, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			if (field[i] == 1)  //Wall 1
-				this.canvasContext.drawImage(this.SPRITES.Wall, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				this.canvasContext.drawImage(this.SPRITES.Wall, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			if (field[i] == 2)  //EmptyCell 2
-				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
 		
 			if (field[i] == 3){ //pacman 3
-				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
 				if((this.pacman.nowDirection == Directions.Right) 
-				|| (this.pacman.nowDirection == Directions.Stay))this.canvasContext.drawImage(this.SPRITES.Right, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if (this.pacman.nowDirection == Directions.Left) this.canvasContext.drawImage(this.SPRITES.Left, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if (this.pacman.nowDirection == Directions.Up)   this.canvasContext.drawImage(this.SPRITES.Top, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
-				if (this.pacman.nowDirection == Directions.Down) this.canvasContext.drawImage(this.SPRITES.Bottom, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				|| (this.pacman.nowDirection == Directions.Stay))this.canvasContext.drawImage(this.SPRITES.Right, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if (this.pacman.nowDirection == Directions.Left) this.canvasContext.drawImage(this.SPRITES.Left, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if (this.pacman.nowDirection == Directions.Up)   this.canvasContext.drawImage(this.SPRITES.Top, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				if (this.pacman.nowDirection == Directions.Down) this.canvasContext.drawImage(this.SPRITES.Bottom, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			}
 			if (field[i] == 4){ //Ghost 4
-				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);  
-				this.canvasContext.drawImage(this.SPRITES.Ghost, (this.CELL.WIDTH*(i%this.COUNTCOLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COUNTCOLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
+				this.canvasContext.drawImage(this.SPRITES.EmptyCell, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);  
+				this.canvasContext.drawImage(this.SPRITES.Ghost, (this.CELL.WIDTH*(i%this.COLUMNS)), (this.CELL.HEIGHT*(Math.floor(i/this.COLUMNS))), this.CELL.WIDTH, this.CELL.HEIGHT);
 			}
 		}
 		this.canvasContext.font = "30px Arial";
@@ -163,4 +140,8 @@ export class GAME {
         }
 		)
     }
+	
+	public stop() {
+		window.location.reload(); 
+	}
 }
