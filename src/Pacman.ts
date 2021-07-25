@@ -19,34 +19,36 @@ export class Pacman {
 	
 	public updatePosition(field:Field){ 
 		if (field.checkCell(this.position, Settings.CELL.PACMAN)){ //pacman
-		
-			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.WALL)) {
-				this.nowDirection = this.nextDirection;
-				this.nowStepX = this.nextStepX;
-				this.nowStepY = this.nextStepY;
-				this.coordinateX = 0;
-				this.coordinateY = 0;
-			}
-			
-			if (!(field.checkCell(this.position+this.nextDirection, Settings.CELL.WALL))){
-				this.nowDirection = this.nextDirection;
-				this.nowStepX = this.nextStepX;
-				this.nowStepY = this.nextStepY;
-				this.coordinateX = 0;
-				this.coordinateY = 0;
-			}
-			
-			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.GHOST)){
+						
+			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.GHOST)){ 	//if GHOST on now direction
 				field.replaceCell(this.position, Settings.CELL.EMPTY_CELL);
 			}
 			
-			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.FOOD_CELL))
+			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.FOOD_CELL))  //if FOOD_CELL on now direction
 				this.score++;
 			
-			if (!(field.checkCell(this.position+this.nowDirection, Settings.CELL.WALL)) && !(field.checkCell(this.position, Settings.CELL.EMPTY_CELL))) {
+			if (!(field.checkCell(this.position+this.nowDirection, Settings.CELL.WALL)) &&  //if not wall on now direction
+				!(field.checkCell(this.position, Settings.CELL.EMPTY_CELL))) {				//if pacman is died
+				
 				field.replaceCell(this.position, Settings.CELL.EMPTY_CELL);
 				field.replaceCell(this.position+this.nowDirection, Settings.CELL.PACMAN);
 				this.position = this.position + this.nowDirection;
+				this.coordinateX = 0;
+				this.coordinateY = 0;
+				
+			} 
+			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.WALL)) {  	//if wall on now direction
+				this.coordinateX = 0;
+				this.coordinateY = 0;
+				this.nowStepX = 0;
+				this.nowStepY = 0;	
+			}
+			if (!(field.checkCell(this.position+this.nextDirection, Settings.CELL.WALL))){  //if not wall on new direction
+				this.nowDirection = this.nextDirection;
+				this.nowStepX = this.nextStepX;
+				this.nowStepY = this.nextStepY;
+				this.coordinateX = 0;
+				this.coordinateY = 0;
 			}
 			
 		}

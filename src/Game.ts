@@ -2,12 +2,12 @@ import {Pacman} from "./Pacman";
 import {Ghost} from "./Ghost";
 import {Field} from "./Field";
 import {Render} from "./Render";
-import {sleep} from "./Helper";
 import {Settings} from "./Settings";
 
 export class Game {
 	food = 0
 	lose = false;
+	delay = 0;
 	
 	ghosts = new Array();
 	pacman = new Pacman();
@@ -33,28 +33,32 @@ export class Game {
 		for(let i = 0; i < Settings.CELL.COUNT; i++) 
 			if(this.field.checkCell(i, Settings.CELL.FOOD_CELL)) 
 				this.food++;
-			
 	}
 	
 	private updateState() {
-		//this.pacman.updatePosition(this.field);	//Pacman
-		setTimeout(this.pacman.updatePosition, 200, this.field);
+		
+		this.pacman.updatePosition(this.field);	//Pacman
+		
 		if (!(this.field.checkCell(this.pacman.position, Settings.CELL.PACMAN))) this.lose = true;
 		
 		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){  //Ghosts
-		
-			if (this.field.checkCell(this.ghosts[i].position, Settings.CELL.GHOST)){
-				this.ghosts[i].setDirection(this.field);	
-				this.ghosts[i].updatePosition(this.field);				  		
-			}
+			this.ghosts[i].updatePosition(this.field);
+			this.ghosts[i].setDirection(this.field);	
 		}		
 	}
 	
 	private tick() {
 		window.onkeydown = this.processKey.bind(this);
-		this.updateState();
-		this.render.draw(this.pacman, this.field);
-		sleep(500);
+		if (this.delay > Settings.PAUSE) {
+			this.delay = 0;
+			this.updateState();
+		}
+		this.delay++;
+		
+		this.render.draw(this.pacman, this.ghosts, this.field);
+		
+		let j = (new Date()).getTime();
+		while (((new Date()).getTime() - j) < Settings.FPS) {}
 	}
 	
 	public processKey(event:any) {
