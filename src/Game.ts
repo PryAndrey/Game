@@ -3,7 +3,7 @@ import {Ghost} from "./Ghost";
 import {Field} from "./Field";
 import {Render} from "./Render";
 import {sleep} from "./Helper";
-import {Settings, Directions} from "./Settings";
+import {Settings} from "./Settings";
 
 export class Game {
 	food = 0
@@ -15,73 +15,56 @@ export class Game {
 	render = new Render();
 	
 	public start() {
-		this.render.initCanvas(Settings.WIDTH, Settings.HEIGHT);
+		
+		this.render.initCanvas();
+		
 		this.initEntitys();
+		
 		this.initGameLoop();
+		
 	}
 	
 	private initEntitys(){
-		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){
-			this.ghosts[i] = new Ghost();		
-		}
-		let Count = 0;
-		for(let i = 0; i < Settings.CELL.COUNT; i++){ //Ghost
-			if (this.field.checkCell(i, 4)){ 
-				if (Count < Settings.GHOSTS_COUNT){
-					this.ghosts[Count].position = i;
-				} else {
-					this.field.replaceCell(i, 0);
-				}
-				Count++;			
-			}
-			if (this.field.checkCell(i, 3)) //pacman 3
-				this.pacman.position = i;		
-		}
-		for(let i = 0; i < Settings.CELL.COUNT; i++) if(this.field.checkCell(i, 0)) this.food++;
-	}	
+		
+		Ghost.initGhosts(this.ghosts, this.field);
+		
+		this.pacman.initPacman(this.field);
+		
+		for(let i = 0; i < Settings.CELL.COUNT; i++) 
+			if(this.field.checkCell(i, Settings.CELL.FOOD_CELL)) 
+				this.food++;
+			
+	}
 	
-	private updateState() {	
-		this.pacman.updatePosition(this.field);	//Pacman
+	private updateState() {
+		//this.pacman.updatePosition(this.field);	//Pacman
+		setTimeout(this.pacman.updatePosition, 200, this.field);
 		if (!(this.field.checkCell(this.pacman.position, Settings.CELL.PACMAN))) this.lose = true;
-		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){  //Ghost
+		
+		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){  //Ghosts
+		
 			if (this.field.checkCell(this.ghosts[i].position, Settings.CELL.GHOST)){
 				this.ghosts[i].setDirection(this.field);	
-				this.ghosts[i].updatePosition(this.field);
-				this.ghosts[i].direction = Directions.Stay;				  		
+				this.ghosts[i].updatePosition(this.field);				  		
 			}
-		}
+		}		
 	}
 	
 	private tick() {
 		window.onkeydown = this.processKey.bind(this);
 		this.updateState();
 		this.render.draw(this.pacman, this.field);
-		sleep(Settings.PAUSE);
+		sleep(500);
 	}
 	
 	public processKey(event:any) {
-		if (event.keyCode == Settings.KEY.UP) { //Вверх
-			this.pacman.nextDirection = Directions.Up;
-		}
-		if (event.keyCode == Settings.KEY.DOWN) { //Вниз
-			this.pacman.nextDirection = Directions.Down;
-		}
-		if (event.keyCode == Settings.KEY.LEFT) { //Влево
-			this.pacman.nextDirection = Directions.Left;
-		}
-		if (event.keyCode == Settings.KEY.RIGHT) { //Вправо
-			this.pacman.nextDirection = Directions.Right;
-		}
+		this.pacman.setDirection(event.keyCode)
 	}
 	
 	private gameIsOver(){		
 		if ((this.lose) || (this.pacman.score == this.food)) {
-			if (this.lose) {
-				alert("Ты проиграл!"); 
-			}
-			if (this.pacman.score == this.food) {
-				alert("Ты победил!"); 
-			}
+			if (this.lose) alert("Ты проиграл!");
+			if (this.pacman.score == this.food) alert("Ты победил!");
 			return true;
 		} else {return false;}
 	}
@@ -92,8 +75,7 @@ export class Game {
                 this.tick();
                 this.initGameLoop();
             }
-        }
-		)
+        })
     }
 	
 	public stop() {

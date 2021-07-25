@@ -1,8 +1,8 @@
 import {Field} from "./Field";
-import {Directions} from "./Settings";
+import {Directions, Settings} from "./Settings";
 
-export class Ghost {
-	memory = 2
+export class Ghost { 
+	memory = Settings.CELL.EMPTY_CELL
 	direction: Directions = Directions.Stay	
 	position = 0
 	
@@ -13,58 +13,79 @@ export class Ghost {
 	}
 
 	public setDirection(field:Field){
-		if ((field.checkCell(this.position+Directions.Right, 0)) || (field.checkCell(this.position+Directions.Left, 0)) || 
-			(field.checkCell(this.position+Directions.Down, 0)) || (field.checkCell(this.position+Directions.Up, 0)) || 
-		    (field.checkCell(this.position+Directions.Right, 2)) || (field.checkCell(this.position+Directions.Left, 2)) || 
-			(field.checkCell(this.position+Directions.Down, 2)) || (field.checkCell(this.position+Directions.Up, 2))){
-		    if (!((field.checkCell(this.position+Directions.Right, 3)) || (field.checkCell(this.position+Directions.Left, 3)) || 
-				(field.checkCell(this.position+Directions.Down, 3)) || (field.checkCell(this.position+Directions.Up, 3)))){		
+		if ((field.checkCell(this.position+Directions.Right, Settings.CELL.FOOD_CELL)) || (field.checkCell(this.position+Directions.Left, Settings.CELL.FOOD_CELL)) || 
+			(field.checkCell(this.position+Directions.Down, Settings.CELL.FOOD_CELL)) || (field.checkCell(this.position+Directions.Up, Settings.CELL.FOOD_CELL)) || 
+		    (field.checkCell(this.position+Directions.Right, Settings.CELL.EMPTY_CELL)) || (field.checkCell(this.position+Directions.Left, Settings.CELL.EMPTY_CELL)) || 
+			(field.checkCell(this.position+Directions.Down, Settings.CELL.EMPTY_CELL)) || (field.checkCell(this.position+Directions.Up, Settings.CELL.EMPTY_CELL))){
+		    if (!((field.checkCell(this.position+Directions.Right, Settings.CELL.PACMAN)) || (field.checkCell(this.position+Directions.Left, Settings.CELL.PACMAN)) || 
+				(field.checkCell(this.position+Directions.Down, Settings.CELL.PACMAN)) || (field.checkCell(this.position+Directions.Up, Settings.CELL.PACMAN)))){		
 				while (this.direction == Directions.Stay) {
 					let R = this.getRandomIntInclusive(1, 4);	
 					if (R <= 2){
 						if (R == 1){
-							if (!(field.checkCell(this.position+Directions.Right, 1)) && 
-							!(field.checkCell(this.position+Directions.Right, 4))) 
+							if (!(field.checkCell(this.position+Directions.Right, Settings.CELL.WALL)) && 
+							!(field.checkCell(this.position+Directions.Right, Settings.CELL.GHOST))) 
 								this.direction = Directions.Right;
 						}else{	
-							if (!(field.checkCell(this.position+Directions.Left, 1)) && 
-							!(field.checkCell(this.position+Directions.Left, 4))) 
+							if (!(field.checkCell(this.position+Directions.Left, Settings.CELL.WALL)) && 
+							!(field.checkCell(this.position+Directions.Left, Settings.CELL.GHOST))) 
 								this.direction = Directions.Left;
 						}
 					}else{
 						if (R == 3){
-							if (!(field.checkCell(this.position+Directions.Down, 1)) && 
-							!(field.checkCell(this.position+Directions.Down, 4))) 
+							if (!(field.checkCell(this.position+Directions.Down, Settings.CELL.WALL)) && 
+							!(field.checkCell(this.position+Directions.Down, Settings.CELL.GHOST))) 
 								this.direction = Directions.Down;
 						}else{ 
-							if (!(field.checkCell(this.position+Directions.Up, 1)) && 
-							!(field.checkCell(this.position+Directions.Up, 4))) 
+							if (!(field.checkCell(this.position+Directions.Up, Settings.CELL.WALL)) && 
+							!(field.checkCell(this.position+Directions.Up, Settings.CELL.GHOST))) 
 								this.direction = Directions.Up;
 						}				
 					}
 				}
 			}else{	
-				if (field.checkCell(this.position+Directions.Right, 3)) this.direction = Directions.Right;	
-				if (field.checkCell(this.position+Directions.Left, 3)) this.direction = Directions.Left;	
-				if (field.checkCell(this.position+Directions.Down, 3)) this.direction = Directions.Down;	
-				if (field.checkCell(this.position+Directions.Up, 3)) this.direction = Directions.Up;			
+				if (field.checkCell(this.position+Directions.Right, Settings.CELL.PACMAN)) this.direction = Directions.Right;	
+				if (field.checkCell(this.position+Directions.Left, Settings.CELL.PACMAN)) this.direction = Directions.Left;	
+				if (field.checkCell(this.position+Directions.Down, Settings.CELL.PACMAN)) this.direction = Directions.Down;	
+				if (field.checkCell(this.position+Directions.Up, Settings.CELL.PACMAN)) this.direction = Directions.Up;			
 			}
 		}
     }
 	
 	public updatePosition(field:Field){
-		if (!(field.checkCell(this.position+this.direction, 1))){				
-			if (this.memory == 0)
-				field.replaceCell(this.position, 0);
-			if (this.memory == 2)
-				field.replaceCell(this.position, 2);
+		if (!(field.checkCell(this.position+this.direction, Settings.CELL.WALL))){				
+			if (this.memory == Settings.CELL.FOOD_CELL)
+				field.replaceCell(this.position, Settings.CELL.FOOD_CELL);
+			if (this.memory == Settings.CELL.EMPTY_CELL)
+				field.replaceCell(this.position, Settings.CELL.EMPTY_CELL);
 				
-			if (field.checkCell(this.position+this.direction, 0))
-				this.memory = 0;
-			if (field.checkCell(this.position+this.direction, 2))
-				this.memory = 2;
-			field.replaceCell(this.position+this.direction, 4);	
+			if (field.checkCell(this.position+this.direction, Settings.CELL.FOOD_CELL))
+				this.memory = Settings.CELL.FOOD_CELL;
+			if (field.checkCell(this.position+this.direction, Settings.CELL.EMPTY_CELL))
+				this.memory = Settings.CELL.EMPTY_CELL;
+			field.replaceCell(this.position+this.direction, Settings.CELL.GHOST);	
 			this.position = this.position + this.direction;
-			}		
+			}
+		this.direction = Directions.Stay;
     }	
+	
+	public static initGhosts(ghosts: any, field:Field){	
+		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){  //Create ghosts
+			ghosts[i] = new Ghost();		
+		}
+		
+		let Count = 0;
+		for(let i = 0; i < Settings.CELL.COUNT; i++){ //Ghost
+			
+			if (field.checkCell(i, Settings.CELL.GHOST)){ 
+				if (Count < Settings.GHOSTS_COUNT){
+					ghosts[Count].position = i;
+				} else {
+					field.replaceCell(i, Settings.CELL.FOOD_CELL);
+				}
+								
+				Count++;			
+			}
+		}
+	}
 }

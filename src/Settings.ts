@@ -3,8 +3,11 @@ export const Settings = {
     HEIGHT: 840,
 	COLUMNS: 19,
 	ROWS: 21,
-	PAUSE: 400,
-	GHOSTS_COUNT: 2,
+	PAUSE: 200,
+	FPS: 600/60,
+	
+	STEP: 20,
+	GHOSTS_COUNT: 4,
 	KEY: {
 		UP: 38,
 		RIGHT: 39,

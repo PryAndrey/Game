@@ -2,7 +2,8 @@ import {Pacman} from "./Pacman";
 import {Field} from "./Field";
 import {Settings, Directions} from "./Settings";
 
-export class Render {		
+export class Render {
+
 	private connectSprites(){
 		Settings.SPRITES.Top.src = "img/PacmanT.png"
 		Settings.SPRITES.Bottom.src = "img/PacmanB.png"
@@ -13,17 +14,17 @@ export class Render {
 		Settings.SPRITES.EmptyCell.src = "img/EmptyCell.png"
 		Settings.SPRITES.FoodCell.src = "img/FoodCell.png"
 	}
+	
 	private canvas: HTMLCanvasElement;
     private canvasContext: CanvasRenderingContext2D;
-    constructor()
-    {
+    constructor() {
         this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
         this.canvasContext = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     }
 	
-	public initCanvas(WIDTH:number, HEIGHT:number){
-		this.canvas.width = WIDTH;
-		this.canvas.height = HEIGHT;
+	public initCanvas(){
+		this.canvas.width = Settings.WIDTH;
+		this.canvas.height = Settings.HEIGHT;
 		this.connectSprites();
 	}
 	
@@ -41,19 +42,24 @@ export class Render {
 				this.drawCell(Settings.SPRITES.Wall, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 			if (field.checkCell(i, Settings.CELL.EMPTY_CELL))  //EmptyCell
 				this.drawCell(Settings.SPRITES.EmptyCell, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
-		
+			
+			
 			if (field.checkCell(i, Settings.CELL.PACMAN)){ //pacman
 				this.drawCell(Settings.SPRITES.EmptyCell, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 				
 				if((pacman.nowDirection == Directions.Right) || (pacman.nowDirection == Directions.Stay))
-					this.drawCell(Settings.SPRITES.Right, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+					this.drawCell(Settings.SPRITES.Right,  Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 				if (pacman.nowDirection == Directions.Left) 
-					this.drawCell(Settings.SPRITES.Left, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+					this.drawCell(Settings.SPRITES.Left,   Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 				if (pacman.nowDirection == Directions.Up)   
-					this.drawCell(Settings.SPRITES.Top, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+					this.drawCell(Settings.SPRITES.Top,    Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 				if (pacman.nowDirection == Directions.Down) 
-					this.drawCell(Settings.SPRITES.Bottom, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+					this.drawCell(Settings.SPRITES.Bottom, Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+				
+				pacman.coordinateX = pacman.coordinateX + pacman.nowStepX;
+				pacman.coordinateY = pacman.coordinateY + pacman.nowStepY;
 			}
+			
 			if (field.checkCell(i, Settings.CELL.GHOST)){ //Ghost
 				this.drawCell(Settings.SPRITES.EmptyCell, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);  
 				this.drawCell(Settings.SPRITES.Ghost, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
