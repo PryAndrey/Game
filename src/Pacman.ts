@@ -19,16 +19,10 @@ export class Pacman {
 	
 	public updatePosition(field:Field){ 
 		if (field.checkCell(this.position, Settings.CELL.PACMAN)){ //pacman
-						
-			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.GHOST)){ 	//if GHOST on now direction
-				field.replaceCell(this.position, Settings.CELL.EMPTY_CELL);
-			}
-			
 			if (field.checkCell(this.position+this.nowDirection, Settings.CELL.FOOD_CELL))  //if FOOD_CELL on now direction
 				this.score++;
 			
-			if (!(field.checkCell(this.position+this.nowDirection, Settings.CELL.WALL)) &&  //if not wall on now direction
-				!(field.checkCell(this.position, Settings.CELL.EMPTY_CELL))) {				//if pacman is died
+			if (!(field.checkCell(this.position+this.nowDirection, Settings.CELL.WALL))){  //if not wall on now direction
 				
 				field.replaceCell(this.position, Settings.CELL.EMPTY_CELL);
 				field.replaceCell(this.position+this.nowDirection, Settings.CELL.PACMAN);
@@ -53,8 +47,7 @@ export class Pacman {
 			
 		}
 	}
-	
-				
+			
 	public setDirection(key:number){
 		if (key == Settings.KEY.UP) { //Вверх
 			this.nextDirection = Directions.Up;
@@ -78,10 +71,15 @@ export class Pacman {
 		}	
 	}
 	
-	public initPacman(field:Field){			
+	public initPacman(field:Field) {			
 		for(let i = 0; i < Settings.CELL.COUNT; i++)	
 			if (field.checkCell(i, Settings.CELL.PACMAN)) {
 				this.position = i;	
 		}			
+	}
+	
+	public updateCoordinates() {
+		this.coordinateX = this.coordinateX + this.nowStepX;
+		this.coordinateY = this.coordinateY + this.nowStepY;	
 	}
 }

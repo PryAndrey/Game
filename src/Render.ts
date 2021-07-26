@@ -1,4 +1,5 @@
 import {Pacman} from "./Pacman";
+import {Ghost} from "./Ghost";
 import {Field} from "./Field";
 import {Settings, Directions} from "./Settings";
 
@@ -40,46 +41,36 @@ export class Render {
 			if (field.checkCell(i, Settings.CELL.PACMAN)) //pacman
 				this.canvasContext.drawImage(Settings.SPRITES.EmptyCell, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 			if (field.checkCell(i, Settings.CELL.GHOST)){ //Ghost
-				let Count = 0;
-				while(ghosts[Count].position != i){
-					Count++;
-				}
-				if (ghosts[Count].memory == Settings.CELL.FOOD_CELL)
+				let memory = Ghost.getGhostMemory(ghosts, i);
+				if (memory == Settings.CELL.FOOD_CELL)
 					this.canvasContext.drawImage(Settings.SPRITES.FoodCell, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);  
-				if (ghosts[Count].memory == Settings.CELL.EMPTY_CELL)
+				if (memory == Settings.CELL.EMPTY_CELL)
 					this.canvasContext.drawImage(Settings.SPRITES.EmptyCell, Settings.CELL.WIDTH*(i%Settings.COLUMNS), Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)), Settings.CELL.WIDTH, Settings.CELL.HEIGHT);  
 			}
 		}
 		
-		for(let i = 0; i <= Settings.CELL.COUNT; i++){
-			if (field.checkCell(i, Settings.CELL.PACMAN)){ //pacman
-				if((pacman.nowDirection == Directions.Right) || (pacman.nowDirection == Directions.Stay))
-					this.canvasContext.drawImage(Settings.SPRITES.Right,  Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
-				if (pacman.nowDirection == Directions.Left) 
-					this.canvasContext.drawImage(Settings.SPRITES.Left,   Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
-				if (pacman.nowDirection == Directions.Up)   
-					this.canvasContext.drawImage(Settings.SPRITES.Top,    Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
-				if (pacman.nowDirection == Directions.Down) 
-					this.canvasContext.drawImage(Settings.SPRITES.Bottom, Settings.CELL.WIDTH*(i%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(i/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
-				pacman.coordinateX = pacman.coordinateX + pacman.nowStepX;
-				pacman.coordinateY = pacman.coordinateY + pacman.nowStepY;
-			}
+		if (field.checkCell(pacman.position, Settings.CELL.PACMAN)){ //pacman
+			if((pacman.nowDirection == Directions.Right) || (pacman.nowDirection == Directions.Stay))
+				this.canvasContext.drawImage(Settings.SPRITES.Right,  Settings.CELL.WIDTH*(pacman.position%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(pacman.position/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+			if (pacman.nowDirection == Directions.Left) 
+				this.canvasContext.drawImage(Settings.SPRITES.Left,   Settings.CELL.WIDTH*(pacman.position%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(pacman.position/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+			if (pacman.nowDirection == Directions.Up)   
+				this.canvasContext.drawImage(Settings.SPRITES.Top,    Settings.CELL.WIDTH*(pacman.position%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(pacman.position/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+			if (pacman.nowDirection == Directions.Down) 
+				this.canvasContext.drawImage(Settings.SPRITES.Bottom, Settings.CELL.WIDTH*(pacman.position%Settings.COLUMNS) + pacman.coordinateX, Settings.CELL.HEIGHT*Math.floor(pacman.position/Settings.COLUMNS) + pacman.coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
 			
+			pacman.updateCoordinates();
+		}
+			
+		for(let i = 0; i <= Settings.CELL.COUNT; i++){	
 			if (field.checkCell(i, Settings.CELL.GHOST)){ //Ghost
+			
 				let Count = 0;
 				while(ghosts[Count].position != i){
 					Count++;
 				}
-				if ((ghosts[Count].position + ghosts[Count].direction == Settings.CELL.WALL) || (ghosts[Count].position + ghosts[Count].direction == Settings.CELL.GHOST)) {
-					ghosts[Count].stepX = 0;
-					ghosts[Count].stepY = 0;
-					ghosts[Count].coordinateX = 0;
-					ghosts[Count].coordinateY = 0;
-				}
-				ghosts[Count].coordinateX = ghosts[Count].coordinateX + ghosts[Count].stepX;
-				ghosts[Count].coordinateY = ghosts[Count].coordinateY + ghosts[Count].stepY;
-				
 				this.canvasContext.drawImage(Settings.SPRITES.Ghost, Settings.CELL.WIDTH*(i%Settings.COLUMNS) + ghosts[Count].coordinateX, Settings.CELL.HEIGHT*(Math.floor(i/Settings.COLUMNS)) + ghosts[Count].coordinateY, Settings.CELL.WIDTH, Settings.CELL.HEIGHT);
+				Ghost.updateCoordinates(ghosts, Count);
 			}
 		}
 		

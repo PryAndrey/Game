@@ -27,8 +27,6 @@ export class Ghost {
 		if (!((field.checkCell(this.position+Directions.Right, Settings.CELL.PACMAN)) || (field.checkCell(this.position+Directions.Left, Settings.CELL.PACMAN)) || 
 			  (field.checkCell(this.position+Directions.Down,  Settings.CELL.PACMAN)) || (field.checkCell(this.position+Directions.Up,   Settings.CELL.PACMAN)))){
 			
-			this.coordinateX = 0;
-			this.coordinateY = 0;
 			let right = true;
 			let left = true;
 			let up = true;
@@ -41,6 +39,8 @@ export class Ghost {
 						this.direction = Directions.Right;
 						this.stepX = Settings.STEP;
 						this.stepY = 0;
+						this.coordinateX = -Settings.CELL.WIDTH;
+						this.coordinateY = 0;
 					} else right = false;
 				}
 				if (R == 2){
@@ -49,6 +49,8 @@ export class Ghost {
 						this.direction = Directions.Left;
 						this.stepX = -Settings.STEP;
 						this.stepY = 0;
+						this.coordinateX = Settings.CELL.WIDTH;
+						this.coordinateY = 0;
 					} else left = false;
 				}
 				if (R == 3){
@@ -57,6 +59,8 @@ export class Ghost {
 						this.direction = Directions.Down;
 						this.stepX = 0;
 						this.stepY = Settings.STEP;
+						this.coordinateX = 0;
+						this.coordinateY = -Settings.CELL.WIDTH;
 					} else down = false;
 				}
 				if (R == 4){
@@ -65,6 +69,8 @@ export class Ghost {
 						this.direction = Directions.Up;
 						this.stepX = 0;
 						this.stepY = -Settings.STEP;
+						this.coordinateX = 0;
+						this.coordinateY = Settings.CELL.WIDTH;
 					} else up = false;	
 				}
 			}	
@@ -73,21 +79,29 @@ export class Ghost {
 				this.direction = Directions.Right;	
 				this.stepX = Settings.STEP;
 				this.stepY = 0;
+				this.coordinateX = -Settings.CELL.WIDTH;
+				this.coordinateY = 0;
 			}
 			if (field.checkCell(this.position+Directions.Left, Settings.CELL.PACMAN)) {
 				this.direction = Directions.Left;	
 				this.stepX = -Settings.STEP;
 				this.stepY = 0;
+				this.coordinateX = Settings.CELL.WIDTH;
+				this.coordinateY = 0;
 			}
 			if (field.checkCell(this.position+Directions.Down, Settings.CELL.PACMAN)) {
 				this.direction = Directions.Down;	
 				this.stepX = 0;
 				this.stepY = Settings.STEP;
+				this.coordinateX = 0;
+				this.coordinateY = -Settings.CELL.WIDTH;
 			}
 			if (field.checkCell(this.position+Directions.Up,   Settings.CELL.PACMAN)) {
 				this.direction = Directions.Up;		
 				this.stepX = 0;
 				this.stepY = -Settings.STEP;	
+				this.coordinateX = 0;
+				this.coordinateY = Settings.CELL.WIDTH;
 			}
 		}
 	}
@@ -107,6 +121,19 @@ export class Ghost {
 	
 			this.position = this.position + this.direction;
 		}
+	}
+	
+	public static getGhostMemory(ghosts:any, i:number){
+		let Count = 0;
+		while(ghosts[Count].position != i){
+			Count++;
+		}
+		return ghosts[Count].memory;
+	}
+	
+	public static updateCoordinates(ghosts:any, Count:number) {
+		ghosts[Count].coordinateX = ghosts[Count].coordinateX + ghosts[Count].stepX;
+		ghosts[Count].coordinateY = ghosts[Count].coordinateY + ghosts[Count].stepY;
 	}
 	
 	public static initGhosts(ghosts:any, field:Field){	

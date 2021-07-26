@@ -15,36 +15,26 @@ export class Game {
 	render = new Render();
 	
 	public start() {
-		
 		this.render.initCanvas();
-		
 		this.initEntitys();
-		
 		this.initGameLoop();
-		
 	}
 	
 	private initEntitys(){
-		
 		Ghost.initGhosts(this.ghosts, this.field);
-		
 		this.pacman.initPacman(this.field);
-		
-		for(let i = 0; i < Settings.CELL.COUNT; i++) 
-			if(this.field.checkCell(i, Settings.CELL.FOOD_CELL)) 
-				this.food++;
+		this.food = this.field.foodCount();
 	}
 	
 	private updateState() {
-		
+		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){  //Ghosts
+			this.ghosts[i].setDirection(this.field);	
+			this.ghosts[i].updatePosition(this.field);
+		}
 		this.pacman.updatePosition(this.field);	//Pacman
 		
 		if (!(this.field.checkCell(this.pacman.position, Settings.CELL.PACMAN))) this.lose = true;
 		
-		for(let i = 0; i < Settings.GHOSTS_COUNT; i++){  //Ghosts
-			this.ghosts[i].updatePosition(this.field);
-			this.ghosts[i].setDirection(this.field);	
-		}		
 	}
 	
 	private tick() {

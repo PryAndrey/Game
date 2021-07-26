@@ -4,10 +4,10 @@ export const Settings = {
 	COLUMNS: 19,
 	ROWS: 21,
 	PAUSE: 15,
-	FPS: 1000/60,
+	FPS: 600/60,
 	
 	STEP: 2.5,
-	GHOSTS_COUNT: 8,
+	GHOSTS_COUNT: 0,
 	KEY: {
 		UP: 38,
 		RIGHT: 39,
